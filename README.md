@@ -20,6 +20,17 @@ sondage nouvellement créé en JSON :
 Erreurs:
 -'400 bad request' : paramétres incorrects
 
+###Supprimer un sondages
+
+'delete/polls/:id'
+
+réponse avec succès : '204 no content'
+
+Erreurs
+-'404 Page Not Found' : sondage non trouvé
+
+
+
 ### Lister les sondages
 
 'GET /Polls'

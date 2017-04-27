@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <link rel="stylesheet" style="text/css" href="style.css"/>
+    <title>Sondage</title>
+  </head>
+  <body style ="background-image:url(sondage2.jpg);background-repeat:no-repeat;background-size:100%;">
+    <img src="logo-imie_1.png"/>
+    <h1 style ="color :blue; text-align: center;">Interface de Sondage by H.COLIN</h1>
+
+    <ul id="polls"></ul>
+    <button id="btn-get-polls" style ="color: blue";>
+      Récupérer les sondages (GET /polls)
+    </button>
+    <br/>
+    <form id="poll" style="display: none; padding: 50px; border: 2px solid teal; text-align: center; background-color: #00CED1; width:500px;">
+      <h2 class="question"></h2>
+      <ul class="answers"></ul>
+      <button class="btn-vote">
+        Voter
+      </button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+    var pollForm = $('#poll');
+
+    $('#btn-get-polls').click(function() {
+      $.get('/polls', function(polls) {
+        var ulPolls = $('#polls');
+        polls.forEach(function(poll) {
+          var liPoll = $('<li>');
+          var aPoll = $('<a href="#">').text(poll.question)
+            .click(function(e) {
+              e.preventDefault();
+              showPoll(poll.id);
+            });
+          liPoll.append(aPoll);
+          ulPolls.append(liPoll);
+        });
+      });
+    });
+
+    var showPoll = function(id) {
+      $.get('/polls/' + id, function(poll) {
+        pollForm.css('display', 'block');
+        pollForm.attr('action', '/polls/' + id + '/votes');
+        $('#poll .question').text(poll.question);
+        var answersUl = $('#poll .answers');
+        poll.answers.forEach(function (answer, i) {
+          var answerLi = $('<li>');
+          var radio = $('<input type="radio" name="answer">')
+            .val(i);
+          var text = $('<span>').text(answer);
+          answerLi.append(radio, text);
+          answersUl.append(answerLi);
+        });
+      })
+    };
+
+    pollForm.submit(function(e) {
+      e.preventDefault();
+      var answer = $('#poll input[type=radio]:checked').val();
+      if (typeof(answer) !== 'string') return;
+      $.post(pollForm.attr('action'), {
+        answer: answer
+      }, function(result) {
+        console.log(result);
+      });
+    });
+    </script>
+  </body>
+</html>
